@@ -2,16 +2,16 @@ import requests
 import json
 import schedule
 import time
-import yaml
-
-with open("config.yaml", "r") as file:
-    config = yaml.safe_load(file)
+import os
 
 # Replace with your own values
-access_token = 'das'#config['api_credentials']['api_token']
-instagram_account_id = 'das'#config['api_credentials']['account_id']
+access_token = os.getenv("API_TOKEN")
+instagram_account_id = os.getenv("ACC_ID")
 image_url = 'https://testdriven.io/static/images/blog/oauth-python/web_auth_flow.png'
 caption = 'Your caption here'
+
+print(access_token)
+print(instagram_account_id)
 
 def post_to_instagram():
     # Step 1: Upload the image
@@ -43,8 +43,9 @@ def post_to_instagram():
             'access_token': access_token
         }
 
-        publish_response = requests.post(publish_url, data=publish_payload)
-        print(publish_response.json())
+        # publish_response = requests.post(publish_url, data=publish_payload)
+        # print(publish_response.json())
+        print(publish_payload)
     else:
         print("Error uploading image:", upload_response_json)
 
