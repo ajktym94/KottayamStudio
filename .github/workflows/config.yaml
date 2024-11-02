@@ -30,4 +30,4 @@ jobs:
           IG_API_TOKEN: ${{ secrets.IG_API_TOKEN }}
           OPENAI_API: ${{ secrets.OPENAI_API }}
         run: |
-          python your_instagram_script.py
+          python main.py
