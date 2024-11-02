@@ -13,18 +13,14 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from apiclient.http import MediaFileUpload
 
 google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
-print("GDRIVE_FOLDER_ID print", google_drive_folder_id)
 access_token = os.environ.get("IG_API_TOKEN")
-print(access_token)
-instagram_account_id = os.environ["IG_ACC_ID", "def"]
-openai.api_key = os.environ("OPENAI_API", "def")
+instagram_account_id = os.environ.get("IG_ACC_ID")
+openai.api_key = os.environ.get("OPENAI_API")
 
 json_file_name = 'published_files.json'  # Replace with the JSON file name you want to load
-google_drive_folder_id = os.environ("GDRIVE_FODLER_ID")  # Replace with your folder's ID
 
-credentials = os.environ('GDRIVE_CREDENTIALS')
-token = os.environ('GDRIVE_TOKEN')
-print(access_token, instagram_account_id, credentials, token)
+credentials = os.environ.get('GDRIVE_CREDENTIALS')
+token = os.environ.get('GDRIVE_TOKEN')
 token_json = json.loads(token)
 credentials_json = json.loads(credentials)
 
@@ -33,7 +29,7 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 
 creds = None
 # The file token.json stores the user's access and refresh tokens, and is created automatically when the authorization flow completes for the first time.
-creds = Credentials.from_service_account_info(token_json)
+creds = Credentials.from_authorized_user_info(token_json)
 # if os.path.exists("token.json"):
 #     creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
@@ -41,7 +37,7 @@ def set_heroku_env_variable(app_name, key, value):
     try:
         # Construct the command to set the environment variable
         command = f"heroku config:set {key}={value} --app {app_name}"
-        
+        print(value)
         # Execute the command
         subprocess.run(command, shell=True, check=True)
         print(f"Environment variable {key} set for app {app_name}.")
@@ -62,9 +58,9 @@ if not creds or not creds.valid:
         creds = flow.run_local_server(port=0)
 
     # Save the credentials for the next run
-    set_heroku_env_variable('kottayamstudio', 'GDRIVE_TOKEN', json.dumps(creds))
-    with open("token.json", "w") as token:
-        token.write(creds.to_json())
+    set_heroku_env_variable('kottayamstudio', 'GDRIVE_TOKEN', creds.to_json())
+    # with open("token.json", "w") as token:
+    #     token.write(creds.to_json())
 
 service = build('drive', 'v3', credentials=creds)
 
