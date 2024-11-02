@@ -36,7 +36,7 @@ creds = Credentials.from_authorized_user_info(token_json)
 def set_heroku_env_variable(app_name, key, value):
     try:
         # Construct the command to set the environment variable
-        command = f"heroku config:set {key}={value} --app {app_name}"
+        command = f"heroku config:set {key}='{value}' --app {app_name}"
         print(value)
         # Execute the command
         subprocess.run(command, shell=True, check=True)
