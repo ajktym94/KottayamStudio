@@ -21,28 +21,29 @@ json_file_name = 'published_files.json'  # Replace with the JSON file name you w
 
 credentials = os.environ.get('GDRIVE_CREDENTIALS')
 token = os.environ.get('GDRIVE_TOKEN')
+print(token)
 token_json = json.loads(token)
 credentials_json = json.loads(credentials)
 
 # Authenticate and create the Drive API client
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
-creds = None
-# The file token.json stores the user's access and refresh tokens, and is created automatically when the authorization flow completes for the first time.
-creds = Credentials.from_authorized_user_info(token_json)
-# if os.path.exists("token.json"):
-#     creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-
 def set_heroku_env_variable(app_name, key, value):
     try:
         # Construct the command to set the environment variable
-        command = f"heroku config:set {key}='{value}' --app {app_name}"
-        print(value)
+        command = f"heroku config:set {key}={value} --app {app_name}"
+        print(command)
         # Execute the command
         subprocess.run(command, shell=True, check=True)
         print(f"Environment variable {key} set for app {app_name}.")
     except subprocess.CalledProcessError as e:
         print(f"Failed to set environment variable: {e}")
+
+creds = None
+# The file token.json stores the user's access and refresh tokens, and is created automatically when the authorization flow completes for the first time.
+creds = Credentials.from_authorized_user_info(token_json)
+# if os.path.exists("token.json"):
+#     creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
 # If there are no (valid) credentials available, let the user log in.
 if not creds or not creds.valid:
