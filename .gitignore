@@ -1,1 +1,2 @@
-config.yaml
+config
+__pycache__/

@@ -1,61 +1,40 @@
-import requests
-import json
-import schedule
-import time
 import os
+import shutil
+from utils import *
 
-# Replace with your own values
-access_token = os.getenv("API_TOKEN")
-instagram_account_id = os.getenv("ACC_ID")
-image_url = 'https://testdriven.io/static/images/blog/oauth-python/web_auth_flow.png'
-caption = 'Your caption here'
+# Find published_files.json in the folder, else create it
+published_files = find_file_in_folder(json_file_name, google_drive_folder_id)
 
-print(access_token)
-print(instagram_account_id)
+if published_files:
+    published_files_json = download_json_file(published_files['id'])
+    print("JSON data loaded successfully:", published_files_json)
+else:
+    print(f"File '{json_file_name}' not found in the folder. Creating it.\n")
+    published_files_json = {'published_files' : []}
 
-def post_to_instagram():
-    # Step 1: Upload the image
-    upload_url = f'https://graph.instagram.com/v21.0/{instagram_account_id}/media'
+images = list_images_in_folder(google_drive_folder_id)
 
-    # Specify the local file path
-    local_file_path = 'sample.jpg'  # Replace with your actual file path
+for image in images:
+    image_name = image['name']
+    image_id = image['id']
+    
+    # Check if image has already been posted
+    if not is_file_published(image_id, published_files_json):
+        print(f"New file found: {image_name}. Retrieving its URL...\n")
+        
+        url = make_file_public(image_id)
 
-    # Prepare the files dictionary
-    files = {'file': open(local_file_path, 'rb')}
+        post_to_instagram(url)
 
-    upload_payload = {
-        'image_url': image_url,
-        'caption': caption,
-        'access_token': access_token
-    }
+        published_files_json = add_published_file_to_json(published_files_json, image['id'], image_name)
+        
+        if published_files:
+            delete_file(published_files['id'])
 
-    upload_response = requests.post(upload_url, files=files, data=upload_payload)
-    upload_response_json = upload_response.json()
-
-    # Check for errors
-    if 'id' in upload_response_json:
-        creation_id = upload_response_json['id']
-
-        # Step 2: Publish the image
-        publish_url = f'https://graph.instagram.com/v21.0/{instagram_account_id}/media_publish'
-        publish_payload = {
-            'creation_id': creation_id,
-            'access_token': access_token
-        }
-
-        # publish_response = requests.post(publish_url, data=publish_payload)
-        # print(publish_response.json())
-        print(publish_payload)
-    else:
-        print("Error uploading image:", upload_response_json)
-
-post_to_instagram()
-#     # Schedule your job (e.g., every day at 10:00 AM)
-# schedule.every().day.at("10:00").do(post_to_instagram)
-
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)
+        upload_json_to_drive(published_files_json, json_file_name, google_drive_folder_id)
+        
+        shutil.rmtree('tmp')
+        break
 
 
 

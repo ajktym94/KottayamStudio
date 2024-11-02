@@ -12,7 +12,9 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from apiclient.http import MediaFileUpload
 
-access_token = os.environ["IG_API_TOKEN"]
+google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
+print("GDRIVE_FOLDER_ID print", google_drive_folder_id)
+access_token = os.environ.get("IG_API_TOKEN")
 print(access_token)
 instagram_account_id = os.environ["IG_ACC_ID", "def"]
 openai.api_key = os.environ("OPENAI_API", "def")
