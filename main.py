@@ -24,7 +24,7 @@ for image in images:
         
         url = make_file_public(image_id)
 
-        # post_to_instagram(url)
+        post_to_instagram(url)
 
         published_files_json = add_published_file_to_json(published_files_json, image['id'], image_name)
         
