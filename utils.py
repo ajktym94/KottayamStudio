@@ -11,6 +11,10 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from apiclient.http import MediaFileUpload
+<<<<<<< HEAD
+=======
+from PIL import Image,ImageOps
+>>>>>>> ebec375 (Removed secrets)
 
 google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
 access_token = os.environ.get("IG_API_TOKEN")
