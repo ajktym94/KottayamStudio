@@ -1,10 +1,8 @@
 import os
-import time
 import io
 import json
 import requests
 import openai
-import subprocess
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 from google.oauth2.credentials import Credentials
