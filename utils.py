@@ -1,30 +1,30 @@
 import os
+import time
 import io
 import json
 import requests
 import openai
+import subprocess
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from apiclient.http import MediaFileUpload
-<<<<<<< HEAD
-=======
 from PIL import Image,ImageOps
->>>>>>> ebec375 (Removed secrets)
 
-access_token = os.environ.get("IG_API_TOKEN")
-openai.api_key = os.environ.get("OPENAI_API")
-instagram_account_id = os.environ.get("IG_ACC_ID")
 google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
+access_token = os.environ.get("IG_API_TOKEN")
+instagram_account_id = os.environ.get("IG_ACC_ID")
+openai.api_key = os.environ.get("OPENAI_API")
+
+json_file_name = 'published_files.json'  # Replace with the JSON file name you want to load
+
 credentials = os.environ.get('GDRIVE_CREDENTIALS')
 token = os.environ.get('GDRIVE_TOKEN')
 print(token)
 token_json = json.loads(token)
 credentials_json = json.loads(credentials)
-
-json_file_name = 'published_files.json'  # Replace with the JSON file name you want to load
 
 # Authenticate and create the Drive API client
 SCOPES = ['https://www.googleapis.com/auth/drive']
