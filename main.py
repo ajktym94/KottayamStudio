@@ -36,6 +36,11 @@ for image in images:
         shutil.rmtree('tmp')
         break
 
+<<<<<<< HEAD
+=======
+    print("No new images found. Existing images have all been already posted...")
+
+>>>>>>> 1b948d8 (Modified print statement)
 
 
 
