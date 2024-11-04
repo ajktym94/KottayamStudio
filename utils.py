@@ -1,10 +1,8 @@
 import os
-import time
 import io
 import json
 import requests
 import openai
-import subprocess
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 from google.oauth2.credentials import Credentials
@@ -13,32 +11,19 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from apiclient.http import MediaFileUpload
 from PIL import Image,ImageOps
 
-google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
 access_token = os.environ.get("IG_API_TOKEN")
-instagram_account_id = os.environ.get("IG_ACC_ID")
 openai.api_key = os.environ.get("OPENAI_API")
-
-json_file_name = 'published_files.json'  # Replace with the JSON file name you want to load
-
+instagram_account_id = os.environ.get("IG_ACC_ID")
+google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
 credentials = os.environ.get('GDRIVE_CREDENTIALS')
 token = os.environ.get('GDRIVE_TOKEN')
-print(token)
 token_json = json.loads(token)
 credentials_json = json.loads(credentials)
 
+json_file_name = 'published_files.json'  # Replace with the JSON file name you want to load
+
 # Authenticate and create the Drive API client
 SCOPES = ['https://www.googleapis.com/auth/drive']
-
-def set_heroku_env_variable(app_name, key, value):
-    try:
-        # Construct the command to set the environment variable
-        command = f"heroku config:set {key}={value} --app {app_name}"
-        print(command)
-        # Execute the command
-        subprocess.run(command, shell=True, check=True)
-        print(f"Environment variable {key} set for app {app_name}.")
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to set environment variable: {e}")
 
 creds = None
 # The file token.json stores the user's access and refresh tokens, and is created automatically when the authorization flow completes for the first time.
@@ -69,7 +54,6 @@ def find_file_in_folder(file_name, folder_id):
     query = f"'{folder_id}' in parents and name = '{file_name}' and trashed = false"
     results = service.files().list(q=query, fields="files(id, name)").execute()
     files = results.get('files', [])
-    print(files)
     return files[0] if files else None
 
 def download_json_file(file_id):
@@ -91,7 +75,7 @@ def list_images_in_folder(folder_id):
     results = service.files().list(q=query, fields="files(id, name)").execute()
     return results.get('files', [])
 
-def make_file_public(file_id):
+def make_file_public_and_download(file_id, image_name):
     # Set the permissions for the file to public
     permission_body = {
         'role': 'reader',
@@ -106,31 +90,37 @@ def make_file_public(file_id):
 
     # Get the public URL
     public_url = f"https://drive.google.com/uc?id={file_id}"
-    return public_url
 
-def download_image(file_id, file_name):
-    """Downloads a file from Google Drive to the ./tmp directory."""
-    request = service.files().get_media(fileId=file_id)
+    # This URL is for downloading files from Google Drive
     os.mkdir('tmp')
-    file_path = os.path.join(os.getcwd(), 'tmp', file_name)
-    with io.FileIO(file_path, 'wb') as file:
-        downloader = MediaIoBaseDownload(file, request)
-        done = False
-        while not done:
-            status, done = downloader.next_chunk()
-            print(f"Downloading {file_name}: {int(status.progress() * 100)}%.")
+    file_path = os.path.join(os.getcwd(), 'tmp', image_name)
+
+    print("Downloading image....")
+    # Send a GET request
+    response = requests.get(public_url, stream=True)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        with open(file_path, "wb") as f:
+            for chunk in response.iter_content(1024):
+                f.write(chunk)
+        print(f"Image downloaded: {file_path}")
+    else:
+        print(f"Failed to retrieve image. Status code: {response.status_code}")
+
+    return public_url
 
 def delete_file(file_id):
     try:
         # Delete the file
         service.files().delete(fileId=file_id).execute()
-        print(f"File with ID {file_id} has been deleted.")
+        print(f"File published_files.json has been deleted.")
     except Exception as e:
         print(f"An error occurred: {e}")
 
 def upload_json_to_drive(data, file_name, folder_id):
     """Uploads a JSON file to a specific Google Drive folder."""
-    os.mkdir('tmp')
+    # os.mkdir('tmp')
     # Create a temporary JSON file
     temp_file_path = os.path.join(os.getcwd(), 'tmp', file_name)
     with open(temp_file_path, 'w') as json_file:
@@ -150,21 +140,25 @@ def upload_json_to_drive(data, file_name, folder_id):
         fields='id'
     ).execute()
 
-    print(f"File '{file_name}' uploaded successfully with file ID: {file.get('id')}")
+    print(f"File '{file_name}' uploaded successfully.")
 
-def post_to_instagram(url):
+def post_to_instagram(url, image_name):
+    captions = ""
+    if "DSC" in image_name:
+        captions = " #KottayamStudio #ShotOnSony #SonyAlpha"
+    else:
+        captions = " #KottayamStudio #ShotOnOneplus7T #ShotOnOneplus #MobilePhotography"
     # Step 1: Upload the image
     upload_url = f'https://graph.instagram.com/v21.0/{instagram_account_id}/media'
 
     upload_payload = {
         'image_url': url,
-        'caption': get_caption(url),
+        'caption': get_caption(url, image_name) + captions,
         'access_token': access_token
     }
 
     upload_response = requests.post(upload_url, data=upload_payload)
     upload_response_json = upload_response.json()
-    print(upload_response_json)
     # Check for errors
     if 'id' in upload_response_json:
         creation_id = upload_response_json['id']
@@ -175,14 +169,39 @@ def post_to_instagram(url):
             'creation_id': creation_id,
             'access_token': access_token
         }
-
+        print("Posting image...")
         publish_response = requests.post(publish_url, data=publish_payload)
-        print(publish_response)
+        print("Image posted successfully...")
+
+        return True
     else:
         print("Error uploading image:", upload_response_json)
 
-def get_caption(url):
-    url = "https://drive.usercontent.google.com/download?id={}&authuser=0".format(url.split('=')[-1])
+def process_image(image_url, image_name, expiration="1h"):
+    url = "https://file.io"
+    img_path = os.path.join(os.getcwd(), 'tmp', image_name)
+
+    with Image.open(img_path) as img:
+        img = ImageOps.exif_transpose(img)
+        img.thumbnail((1000, 1000))  # Resizes while keeping the aspect ratio
+        img.save(img_path, format='JPEG')
+
+    with open(img_path, "rb") as file:
+        files = {
+            "file": file
+        }
+        data = {
+            "expires": expiration
+        }
+        response = requests.post(url, files=files, data=data)
+        if response.status_code == 200:
+            return response.json()["link"]
+        else:
+            raise Exception(f"Failed to upload image: {response.json()}")
+
+def get_caption(drive_url, image_name):
+    host_url = process_image(drive_url, image_name)
+    print("Generating caption for the image..")
     try:
         completion = openai.chat.completions.create(
             model="gpt-4o",
@@ -194,7 +213,7 @@ def get_caption(url):
                         {
                             "type": "image_url",
                             "image_url": {
-                                "url": url,
+                                "url": host_url,
                             }
                         },
                     ],
@@ -214,5 +233,3 @@ def add_published_file_to_json(js, id, name):
     )
 
     return js
-
-
