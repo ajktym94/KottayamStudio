@@ -18,14 +18,13 @@ access_token = os.environ.get("IG_API_TOKEN")
 openai.api_key = os.environ.get("OPENAI_API")
 instagram_account_id = os.environ.get("IG_ACC_ID")
 google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
-
-json_file_name = 'published_files.json'  # Replace with the JSON file name you want to load
-
 credentials = os.environ.get('GDRIVE_CREDENTIALS')
 token = os.environ.get('GDRIVE_TOKEN')
 print(token)
 token_json = json.loads(token)
 credentials_json = json.loads(credentials)
+
+json_file_name = 'published_files.json'  # Replace with the JSON file name you want to load
 
 # Authenticate and create the Drive API client
 SCOPES = ['https://www.googleapis.com/auth/drive']
