@@ -16,10 +16,10 @@ from apiclient.http import MediaFileUpload
 from PIL import Image,ImageOps
 >>>>>>> ebec375 (Removed secrets)
 
-google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
 access_token = os.environ.get("IG_API_TOKEN")
-instagram_account_id = os.environ.get("IG_ACC_ID")
 openai.api_key = os.environ.get("OPENAI_API")
+instagram_account_id = os.environ.get("IG_ACC_ID")
+google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
 
 json_file_name = 'published_files.json'  # Replace with the JSON file name you want to load
 
