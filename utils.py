@@ -20,6 +20,8 @@ token = os.environ.get('GDRIVE_TOKEN')
 token_json = json.loads(token)
 credentials_json = json.loads(credentials)
 
+
+
 json_file_name = 'published_files.json'  # Replace with the JSON file name you want to load
 
 # Authenticate and create the Drive API client
@@ -152,7 +154,7 @@ def post_to_instagram(url, image_name):
     upload_url = f'https://graph.instagram.com/v21.0/{instagram_account_id}/media'
 
     upload_payload = {
-        'image_url': url,
+        'image_url': process_image(url, image_name),
         'caption': get_caption(url, image_name) + captions,
         'access_token': access_token
     }
@@ -177,14 +179,69 @@ def post_to_instagram(url, image_name):
     else:
         print("Error uploading image:", upload_response_json)
 
-def process_image(image_url, image_name, expiration="1h"):
+def process_image(image_url, image_name, downsize = False, expiration="1h"):
     url = "https://file.io"
     img_path = os.path.join(os.getcwd(), 'tmp', image_name)
 
-    with Image.open(img_path) as img:
-        img = ImageOps.exif_transpose(img)
-        img.thumbnail((1000, 1000))  # Resizes while keeping the aspect ratio
-        img.save(img_path, format='JPEG')
+    if downsize:
+        with Image.open(img_path) as img:
+            img = ImageOps.exif_transpose(img)
+            img.thumbnail((1000, 1000))  # Resizes while keeping the aspect ratio
+            img_path = img_path.replace('.', '_downsized.')
+            img.save(img_path, format='JPEG')
+    else:
+        with Image.open(img_path) as img:
+            img = ImageOps.exif_transpose(img)
+            max_width = 1440
+            aspect_ratio = img.width / img.height
+
+            # Ensure the image meets the aspect ratio and resizing rules
+            if aspect_ratio < 1:  # Portrait (taller than wide)
+                new_height = int(max_width / aspect_ratio)
+                new_size = (max_width, new_height)
+            elif aspect_ratio > 1.91:  # Landscape (wider than allowed)
+                new_height = int(max_width / 1.91)
+                new_size = (max_width, new_height)
+            else:  # Within accepted range
+                new_size = (max_width, int(max_width / aspect_ratio))
+
+            # Resize and save the image
+            resized_image = img.resize(new_size, Image.LANCZOS)
+            print("Image resized to ", new_size)
+            img_path = img_path.replace('.', '_insta_size.')
+            resized_image.save(img_path, format='JPEG')
+            
+            file_metadata = {'name': image_name,'parents': [google_drive_folder_id]}
+    
+            # Define the media file upload
+            media = MediaFileUpload(img_path, mimetype='image/jpeg')
+            
+            # Upload the file
+            uploaded_file = service.files().create(
+                body=file_metadata,
+                media_body=media,
+                fields='id'
+            ).execute()
+            
+            # Get the file ID
+            file_id = uploaded_file.get('id')
+            
+            # Make the file public
+            permission = {
+                'type': 'anyone',
+                'role': 'reader',
+            }
+            service.permissions().create(
+                fileId=file_id,
+                body=permission
+            ).execute()
+            
+            # Generate the public URL
+            public_url = f"https://drive.google.com/uc?id={file_id}"
+            print(f"Public URL: {public_url}")
+            
+            return public_url
+
 
     with open(img_path, "rb") as file:
         files = {
@@ -200,7 +257,7 @@ def process_image(image_url, image_name, expiration="1h"):
             raise Exception(f"Failed to upload image: {response.json()}")
 
 def get_caption(drive_url, image_name):
-    host_url = process_image(drive_url, image_name)
+    host_url = process_image(drive_url, image_name, True)
     print("Generating caption for the image..")
     try:
         completion = openai.chat.completions.create(
@@ -220,6 +277,7 @@ def get_caption(drive_url, image_name):
                 }
             ],
         )
+        print("Caption generated...")
         return completion.choices[0].message.content[1:-1]
     except Exception as ex:
         print(ex)
