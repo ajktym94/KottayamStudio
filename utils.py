@@ -107,16 +107,17 @@ def make_file_public_and_download(file_id, image_name):
             for chunk in response.iter_content(1024):
                 f.write(chunk)
         print(f"Image downloaded: {file_path}")
+        delete_file(file_id, image_name)
     else:
         print(f"Failed to retrieve image. Status code: {response.status_code}")
 
     return public_url
 
-def delete_file(file_id):
+def delete_file(file_id, file_name):
     try:
         # Delete the file
         service.files().delete(fileId=file_id).execute()
-        print(f"File published_files.json has been deleted.")
+        print(f"File {file_name} has been deleted.")
     except Exception as e:
         print(f"An error occurred: {e}")
 

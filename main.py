@@ -31,7 +31,7 @@ for image in images:
         published_files_json = add_published_file_to_json(published_files_json, image['id'], image_name)
         
         if published_files:
-            delete_file(published_files['id'])
+            delete_file(published_files['id'], published_files['name'])
 
         upload_json_to_drive(published_files_json, json_file_name, google_drive_folder_id)
         
