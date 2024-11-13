@@ -11,6 +11,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from apiclient.http import MediaFileUpload
 from PIL import Image,ImageOps
 
+
 access_token = os.environ.get("IG_API_TOKEN")
 openai.api_key = os.environ.get("OPENAI_API")
 instagram_account_id = os.environ.get("IG_ACC_ID")
@@ -240,7 +241,7 @@ def process_image(image_url, image_name, downsize = False, expiration="1h"):
             
             # Generate the public URL
             public_url = f"https://drive.google.com/uc?id={file_id}"
-            print(f"Public URL: {public_url}")
+            # print(f"Public URL: {public_url}")
             
             return public_url
 
