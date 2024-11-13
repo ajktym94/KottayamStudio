@@ -2,7 +2,7 @@ name: Post to Instagram
 
 on:
   schedule:
-    - cron: "* * * * *" 
+    - cron: "5 * * * *" 
 
 jobs:
   post-to-instagram:
