@@ -17,6 +17,7 @@ instagram_account_id = os.environ.get("IG_ACC_ID")
 google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
 credentials = os.environ.get('GDRIVE_CREDENTIALS')
 token = os.environ.get('GDRIVE_TOKEN')
+token = os.environ['GDRIVE_TOKEN']
 print(token)
 token_json = json.loads(token)
 credentials_json = json.loads(credentials)
