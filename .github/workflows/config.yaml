@@ -1,34 +1,28 @@
 name: Post to Instagram
-
-on:
-  workflow_dispatch:
+'on':
+  workflow_dispatch: null
   schedule:
-    - cron: "5 * * * *" 
-
+    - cron: 5 * * * *
 jobs:
   post-to-instagram:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.9'
-
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-
       - name: Run Instagram Post Script
         env:
-          GDRIVE_CREDENTIALS: ${{secrets.GDRIVE_CREDENTIALS}}
-          GDRIVE_FOLDER_ID: ${{secrets.GDRIVE_FOLDER_ID}}
-          GDRIVE_TOKEN: ${{secrets.GDRIVE_TOKEN}}
-          IG_ACC_ID: ${{secrets.IG_ACC_ID}}
-          IG_API_TOKEN: ${{secrets.IG_API_TOKEN}}
-          OPENAI_API: ${{secrets.OPENAI_API}}
+          GDRIVE_CREDENTIALS: '${{secrets.GDRIVE_CREDENTIALS}}'
+          GDRIVE_FOLDER_ID: '${{secrets.GDRIVE_FOLDER_ID}}'
+          GDRIVE_TOKEN: '${{secrets.GDRIVE_TOKEN}}'
+          IG_ACC_ID: '${{secrets.IG_ACC_ID}}'
+          IG_API_TOKEN: '${{secrets.IG_API_TOKEN}}'
+          OPENAI_API: '${{secrets.OPENAI_API}}'
         run: |
           python main.py
