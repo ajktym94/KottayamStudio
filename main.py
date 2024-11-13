@@ -21,7 +21,7 @@ for image in images:
     image_id = image['id']
     
     # Check if image has already been posted
-    if not is_file_published(image_id, published_files_json):
+    if not is_file_published(image_name, published_files_json):
         print(f"New image found: {image_name}. Retrieving its URL...\n")
         
         url = make_file_public_and_download(image_id, image_name)

@@ -46,10 +46,10 @@ if not creds or not creds.valid:
 
 service = build('drive', 'v3', credentials=creds)
 
-def is_file_published(file_id, published_files):
+def is_file_published(file_name, published_files):
     # Search for the file_id in the list of uploaded files
     for file_record in published_files["published_files"]:
-        if file_record["file_id"] == file_id:
+        if file_record["file_name"] == file_name:
             return True  # File ID exists
     return False  # File ID not found
 
