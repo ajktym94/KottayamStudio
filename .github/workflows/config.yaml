@@ -2,7 +2,7 @@ name: Post to Instagram
 'on':
   workflow_dispatch: null
   schedule:
-    - cron: 5 * * * *
+    - cron: 0 10,14,18 * * *
 jobs:
   post-to-instagram:
     runs-on: ubuntu-latest
