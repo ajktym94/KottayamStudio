@@ -4,6 +4,8 @@
 
 Instagram Page : [KottayamStudio](https://www.instagram.com/kottayam.studio/)
 
+<img src="https://github.com/ajktym94/KottayamStudio/blob/main/KottayamStudio.jpg?raw=true" width="720">
+
 ## Features  
 - **Seamless Integration**: Monitors a Google Drive folder for new photos.  
 - **Smart Caption Generation**: Uses ChatGPT to generate engaging captions for each photo.  
