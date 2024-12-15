@@ -2,6 +2,8 @@
 
 📸 Automate the process of posting your photos to Instagram using the **Google Drive API**, **Instagram API**, **ChatGPT**, and **GitHub Actions**.  
 
+Instagram Page : [KottayamStudio](https://www.instagram.com/kottayam.studio/)
+
 ## Features  
 - **Seamless Integration**: Monitors a Google Drive folder for new photos.  
 - **Smart Caption Generation**: Uses ChatGPT to generate engaging captions for each photo.  
