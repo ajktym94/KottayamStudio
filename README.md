@@ -37,34 +37,34 @@
 ---
 
 ## Setup Instructions  
-1. Clone this repository:  
+1. **Clone this repository**:  
    ```bash  
    git clone https://github.com/ajktym94/KottayamStudio.git  
    cd KottayamStudio
    ```
-2. Install dependencies:
+2. **Install dependencies**:
 
    ```bash
    pip install -r requirements.txt  
    ```
 
-3. Configure environment variables:
+3. **Configure environment variables**:
    - Add your Google Drive and Instagram API credentials.
    - Set up any additional configuration in a .env file.
 
-4. Schedule the script using GitHub Actions:
+4. **Schedule the script using GitHub Actions****:
    - Update the workflow.yml file to customize the schedule (default: once daily).
 
 ## Usage
-- Manual Execution: Run the script locally with:
+- **Manual Execution**: Run the script locally with:
    ``` bash
    python main.py
    ``` 
-- Automated Execution: The script will run automatically based on the GitHub Actions schedule.
+- **Automated Execution**: The script will run automatically based on the GitHub Actions schedule.
 
 ## Customization
-  - Caption Customization: Modify the caption generation logic by tweaking the ChatGPT prompt in the script.
-  - Hashtag Management: Add or improve hashtags in the caption creation module.
+  - **Caption Customization**: Modify the caption generation logic by tweaking the ChatGPT prompt in the script.
+  - **Hashtag Managemen**t: Add or improve hashtags in the caption creation module.
 
 ## Future Enhancements
   - Adding location information to posts.
