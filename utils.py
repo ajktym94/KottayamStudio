@@ -11,13 +11,13 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from apiclient.http import MediaFileUpload
 from PIL import Image,ImageOps
 
-
 access_token = os.environ.get("IG_API_TOKEN")
 openai.api_key = os.environ.get("OPENAI_API")
 instagram_account_id = os.environ.get("IG_ACC_ID")
 google_drive_folder_id = os.environ.get("GDRIVE_FOLDER_ID")
 credentials = os.environ.get('GDRIVE_CREDENTIALS')
 token = os.environ.get('GDRIVE_TOKEN')
+imgbb_key = os.environ.get('IMGBB_KEY')
 token_json = json.loads(token)
 credentials_json = json.loads(credentials)
 
@@ -182,7 +182,7 @@ def post_to_instagram(url, image_name):
         print("Error uploading image:", upload_response_json)
 
 def process_image(image_url, image_name, downsize = False, expiration="1h"):
-    url = "https://file.io"
+    url = "https://api.imgbb.com/1/upload"
     img_path = os.path.join(os.getcwd(), 'tmp', image_name)
 
     if downsize:
@@ -247,14 +247,15 @@ def process_image(image_url, image_name, downsize = False, expiration="1h"):
 
     with open(img_path, "rb") as file:
         files = {
-            "file": file
+            "image": file
         }
         data = {
-            "expires": expiration
+            "key": imgbb_key, 
+            "expiration": 216000 # One hour
         }
         response = requests.post(url, files=files, data=data)
         if response.status_code == 200:
-            return response.json()["link"]
+            return response.json()['data']['url']
         else:
             raise Exception(f"Failed to upload image: {response.json()}")
 
